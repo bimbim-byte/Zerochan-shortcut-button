@@ -30,7 +30,7 @@ window.addEventListener("load", () => {
             const regexStaticFile = /^https:\/\/static\.[^\/]+\/.+\.[a-zA-Z0-9]+$/;
 
             if (regexStaticFile.test(href)) {
-                console.warn("Terdeteksi URL file static. Program diabaikan.", href);
+                p_a.target = "_blank";
                 return;
             }
             
@@ -48,6 +48,7 @@ window.addEventListener("load", () => {
 
             const link = `https://static.zerochan.net/${name_cha}.full.${data_id}.${ext}`;
 
+            p_a.target = "_blank";
             // 8. Buat tombol <a> sesuai format
             const a = document.createElement("a");
             if (true) {
@@ -82,15 +83,15 @@ window.addEventListener("load", () => {
 
         }
         else {
-            const p_a = p.querySelectorAll("a");
+            // const p_a = p.querySelectorAll("a");
 
             if (true) {
-                p_a.forEach(a_tag => {  
-                    a_tag.setAttribute("target", "_blank");
+                my_a.forEach(a_tag => {
+                    a_tag.target = "_blank";
                 });
             }
             else {
-                p_a.forEach(a_tag => {
+                my_a.forEach(a_tag => {
                     const slink = a_tag.getAttribute("href");
                     a_tag.setAttribute("href", "#");
                     a_tag.addEventListener("click", (e) => {
