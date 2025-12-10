@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "BMP - ZeroChan Shortcut Button",
+  "version": "1.0",
+  "description": "Simple button to open ZeroChan image in new tab.",
+
+  "icons": {
+    "16": "icon16.png",
+    "128": "icon128.png"
+  },
+
+  "action": {
+    "default_popup": "bmp.html",
+    "default_title": "BMP Panel",
+    "default_icon": {
+      "128": "icon128.png"
+    }
+  },
+
+  "content_scripts": [
+    {
+      "matches": ["*://www.zerochan.net/*"],
+      "js": ["bmp.js"]
+    }
+  ],
+
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ]
+}
