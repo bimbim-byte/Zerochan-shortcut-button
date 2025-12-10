@@ -10,9 +10,9 @@ Simple button to open ZeroChan image in new tab.
 1. Download/Clone the project as a ZIP file from GitHub.
 2. Extract the ZIP file to any folder on your device.
 3. Open your browser’s Extensions or Add-ons page:
-  *Chrome / Brave / Vivaldi / Opera / Arc: chrome://extensions/
-  *Microsoft Edge: edge://extensions/
-  *(Firefox does not support unpacked Chrome extensions directly.)
+  \n*Chrome / Brave / Vivaldi / Opera / Arc: chrome://extensions/
+  \n*Microsoft Edge: edge://extensions/
+  \n*(Firefox does not support unpacked Chrome extensions directly.)
 4. Enable Developer Mode or Developer Options (usually found at the top or bottom of the page).
 5. Click Load unpacked or Load extension.
 6. Select the folder where you extracted the extension.
