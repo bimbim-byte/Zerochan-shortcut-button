@@ -81,6 +81,21 @@ function runDexy() {
                 
                 // 9. Tambahkan ke <p>
                 p.appendChild(a);
+                const q = li.querySelector("p");
+                q.addEventListener("click", function (e) {
+                    let re_link = e.target.closest("a");
+
+                    if (re_link && re_link.href) {
+                        if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey) {
+                            e.preventDefault(); 
+
+                            chrome.runtime.sendMessage({
+                                action: "openBackgroundTab",
+                                url: re_link.href
+                            });
+                        }
+                    }
+                });
 
             }
             else {
@@ -102,7 +117,22 @@ function runDexy() {
                             }, 0);
                         });
                     });
-                }   
+                } 
+                const q = li.querySelector("p");
+                q.addEventListener("click", function (e) {
+                    let re_link = e.target.closest("a");
+
+                    if (re_link && re_link.href) {
+                        if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey) {
+                            e.preventDefault(); 
+
+                            chrome.runtime.sendMessage({
+                                action: "openBackgroundTab",
+                                url: re_link.href
+                            });
+                        }
+                    }
+                });  
             }
         });
     });
