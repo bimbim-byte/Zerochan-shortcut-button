@@ -21,11 +21,24 @@
     {
       "matches": ["*://www.zerochan.net/*"],
       "js": ["bmp.js"]
+    },
+    {
+      "matches": ["*://static.zerochan.net/*"],
+      "js": ["bmp_imgload.js"],
+      "run_at": "document_end"
     }
   ],
 
   "permissions": [
     "activeTab",
-    "scripting"
-  ]
+    "scripting",
+    "tabs",
+    "downloads",
+    "webNavigation"
+  ],
+
+  "background": {
+    "service_worker": "background.js"
+  }
+
 }
