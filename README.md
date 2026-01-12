@@ -1,10 +1,10 @@
 # BMP - ZeroChan Shortcut Button
 
-Simple button to open ZeroChan image in new tab.
+Simple button to download image from Zerochan directly
 
 ## ✨ Fitur Utama
 - Create button on Zerochan Homepage
-- When the button is pressed, it will display/load in a new tab
+- When the button is pressed, it will download directly
 
 ## 📦 Installation
 1. Download/Clone the project as a ZIP file from GitHub.
