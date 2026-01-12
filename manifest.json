@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "BMP - ZeroChan Shortcut Button",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Simple button to open ZeroChan image in new tab.",
 
   "icons": {
