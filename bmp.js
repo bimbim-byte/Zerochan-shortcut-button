@@ -1,142 +1,250 @@
-function runDexy() {
-    window.addEventListener("load", () => {
+function attachSafeClick(a, handler) {
+    if (a.dataset.dexyBound) return;
+    a.dataset.dexyBound = "1";
 
-        // 1. Ambil semua UL
+    a.addEventListener("click", (e) => {
+        if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey) return;
+        e.preventDefault();
+        handler(a.href);
+    });
+}
+
+function runDexy() {
+    console.log("Dexy running");
+
+    let mode = null;
+    const links = document.querySelectorAll('a[href*="?m="]');
+
+    for (const link of links) {
+        const isActive =
+            link.classList.contains('active') ||
+            link.getAttribute('aria-pressed') === 'true';
+
+        if (isActive) {
+            const url = new URL(link.href, window.location.origin);
+            const mValue = url.searchParams.get('m');
+            mode = mValue !== null ? parseInt(mValue) : null;
+            break;
+        }
+    }
+
+    if (mode === null) {
+        console.log("Mode not detected");
+        return;
+    }
+    else if (mode === 0 || mode === 1 || mode === 2) {
         const allUL = document.querySelectorAll("ul");
-        if (allUL.length === 0) return;
+        if (!allUL.length) return;
 
         let targetUL = null;
         allUL.forEach(ul => {
-            if (ul.id && ul.id.includes("thumbs")) {
-                targetUL = ul;
-            }
+            if (ul.id?.includes("thumbs")) targetUL = ul;
         });
-
         if (!targetUL) return;
 
-        // 2. Ambil semua LI dalam UL target
         const items = targetUL.querySelectorAll("li");
 
         items.forEach(li => {
-
-            // 3. Ambil <p> di LI
             const p = li.querySelector("p");
             if (!p) return;
 
             const my_a = p.querySelectorAll("a");
+
+            // ===================== 1 LINK =====================
             if (my_a.length === 1) {
-                p_a = my_a[0];
+                const p_a = my_a[0];
                 const href = p_a.getAttribute("href") || "";
 
                 const regexStaticFile = /^https:\/\/static\.[^\/]+\/.+\.[a-zA-Z0-9]+$/;
 
                 if (regexStaticFile.test(href)) {
                     p_a.target = "_blank";
+
+                    attachSafeClick(p_a, (url) => {
+                        chrome.runtime.sendMessage({ download: url });
+                    });
                     return;
                 }
-                
-                value = li.querySelector("a.thumb img")
-                extension = value.getAttribute("title");
-                alt = value.getAttribute("alt");
-                data_id = li.getAttribute("data-id");
 
-                const regex = /\b([a-zA-Z0-9]+)\s*$/; // ambil kata terakhir di baris pertama
+                const img = li.querySelector("a.thumb img");
+                if (!img) return;
 
-                const match = extension.split("\n")[0].match(regex);
+                const extension = img.getAttribute("title") || "";
+                const alt = img.getAttribute("alt") || "";
+                const data_id = li.getAttribute("data-id");
+
+                const match = extension.split("\n")[0].match(/\b([a-zA-Z0-9]+)\s*$/);
+                if (!match) return;
 
                 const ext = match[1].toLowerCase();
                 const name_cha = alt.replace(/\s+/g, ".");
-
                 const link = `https://static.zerochan.net/${name_cha}.full.${data_id}.${ext}`;
 
                 p_a.target = "_blank";
-                // 8. Buat tombol <a> sesuai format
+
                 const a = document.createElement("a");
-                if (true) {
-                    a.href = link;
-                    a.target = "_blank"; 
+                a.href = link;
+                a.target = "_blank";
 
-                    const s = document.createElement("s");
-                    s.className = "tiny download";
-                    s.title = `download ${ext} image`;
-                    s.style.marginBottom = "-3px";
+                const s = document.createElement("s");
+                s.className = "tiny download";
+                s.title = `download ${ext} image`;
+                s.style.marginBottom = "-3px";
+                a.appendChild(s);
 
-                    a.appendChild(s);
-                } 
-                else {
-                    a.href = "#";
-                    a.addEventListener("click", (e) => {
-                        e.preventDefault();
-                        const linkToOpen = link;
-                        setTimeout(() => {
-                            window.open(linkToOpen, "_blank", "noopener,noreferrer");
-                        }, 0); // delay mikro
-                    });
-                    const s = document.createElement("s");
-                    s.className = "tiny download";
-                    s.title = `download ${ext} image`;
-                    s.style.marginBottom = "-3px";
-                    a.appendChild(s);
-                }
-                
-                // 9. Tambahkan ke <p>
                 p.appendChild(a);
-                const q = li.querySelector("p");
-                q.addEventListener("click", function (e) {
-                    let re_link = e.target.closest("a");
 
-                    if (re_link && re_link.href) {
-                        if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey) {
-                            e.preventDefault(); 
+                const ko = p.querySelectorAll("a");
 
-                            chrome.runtime.sendMessage({
-                                action: "openBackgroundTab",
-                                url: re_link.href
-                            });
-                        }
-                    }
+                attachSafeClick(ko[0], (url) => {
+                    chrome.runtime.sendMessage({
+                        action: "openBackgroundTab",
+                        url
+                    });
                 });
 
+                attachSafeClick(ko[1], () => {
+                    chrome.runtime.sendMessage({ download: link });
+                });
             }
+
+            // ===================== 2 LINK =====================
             else {
-                // const p_a = p.querySelectorAll("a");
+                my_a.forEach(a_tag => a_tag.target = "_blank");
 
-                if (true) {
-                    my_a.forEach(a_tag => {
-                        a_tag.target = "_blank";
+                const ko = p.querySelectorAll("a");
+
+                attachSafeClick(ko[0], (url) => {
+                    chrome.runtime.sendMessage({
+                        action: "openBackgroundTab",
+                        url
                     });
-                }
-                else {
-                    my_a.forEach(a_tag => {
-                        const slink = a_tag.getAttribute("href");
-                        a_tag.setAttribute("href", "#");
-                        a_tag.addEventListener("click", (e) => {
-                            e.preventDefault();
-                            setTimeout(() => {
-                                window.open(slink, "_blank", "noopener,noreferrer");
-                            }, 0);
-                        });
-                    });
-                } 
-                const q = li.querySelector("p");
-                q.addEventListener("click", function (e) {
-                    let re_link = e.target.closest("a");
+                });
 
-                    if (re_link && re_link.href) {
-                        if (e.button === 0 && !e.metaKey && !e.ctrlKey && !e.shiftKey) {
-                            e.preventDefault(); 
-
-                            chrome.runtime.sendMessage({
-                                action: "openBackgroundTab",
-                                url: re_link.href
-                            });
-                        }
-                    }
-                });  
+                attachSafeClick(ko[1], (url) => {
+                    chrome.runtime.sendMessage({ download: url });
+                });
             }
+        });
+    }
+    else if (mode === 3) {
+        const allUL = document.querySelectorAll("ul");
+        if (!allUL.length) return;
+
+        let targetUL = null;
+        allUL.forEach(ul => {
+            if (ul.id?.includes("thumbs")) targetUL = ul;
+        });
+        if (!targetUL) return;
+
+        const items = targetUL.querySelectorAll("li");
+
+        items.forEach(li => {
+            const p = li.querySelector("p");
+            if (!p) return;
+
+            const my_a = p.querySelectorAll("a");
+
+            if (!my_a.length) return;
+            const last_a = my_a[my_a.length - 1];
+
+
+            const regexStaticFile = /^https:\/\/static\.[^\/]+\/.+\.[a-zA-Z0-9]+$/;
+
+            if (regexStaticFile.test(last_a.href)) {
+                last_a.target = "_blank";
+
+                attachSafeClick(last_a, (url) => {
+                    chrome.runtime.sendMessage({ download: last_a.href });
+                });
+                return;
+            }
+
+            const img = li.querySelector("a.thumb img");
+            if (!img) return;
+
+            const extension = img.getAttribute("title") || "";
+            const alt = img.getAttribute("alt") || "";
+            const data_id = li.getAttribute("data-id");
+
+            const match = extension.split("\n")[0].match(/\b([a-zA-Z0-9]+)\s*$/);
+            if (!match) return;
+
+            const ext = match[1].toLowerCase();
+            const name_cha = alt.replace(/\s+/g, ".");
+            const link = `https://static.zerochan.net/${name_cha}.full.${data_id}.${ext}`;
+
+            const a = document.createElement("a");
+            a.href = link;
+            a.target = "_blank";
+
+            const s = document.createElement("s");
+            s.className = "tiny download";
+            s.title = `download ${ext} image`;
+            s.style.marginBottom = "-3px";
+            a.appendChild(s);
+
+            attachSafeClick(a, (url) => {
+                chrome.runtime.sendMessage({ download: link });
+            });
+
+            p.appendChild(a);
+
+        });
+    }
+    else if (mode === 4) {
+    const thumbs = document.querySelectorAll('a.thumb');
+    if (!thumbs.length) return;
+
+    thumbs.forEach(thumb => {
+        if (thumb.dataset.dexyInjected) return;
+        thumb.dataset.dexyInjected = "1";
+
+        // ambil ID dari href (/4634725)
+        const idMatch = thumb.getAttribute("href")?.match(/\/(\d+)/);
+        if (!idMatch) return;
+        const data_id = idMatch[1];
+
+        // ambil URL background-image
+        const bg = thumb.style.backgroundImage;
+        const urlMatch = bg.match(/url\(["']?(.*?)["']?\)/);
+        if (!urlMatch) return;
+        const imageUrl = urlMatch[1];
+
+        // buat tombol download
+        const btn = document.createElement("a");
+        btn.href = imageUrl;
+        btn.target = "_blank";
+        btn.style.position = "absolute";
+        btn.style.right = "6px";
+        btn.style.bottom = "6px";
+        btn.style.zIndex = "10";
+
+        const s = document.createElement("s");
+        s.className = "tiny download";
+        s.title = "Download image";
+
+        btn.appendChild(s);
+
+        // pastikan parent relative
+        thumb.style.position = "relative";
+        thumb.appendChild(btn);
+
+        attachSafeClick(btn, () => {
+            chrome.runtime.sendMessage({
+                download: imageUrl
+            });
         });
     });
 }
+
+
+
+    
+
+        
+}
+
 
 
 function createFloatingButton() {

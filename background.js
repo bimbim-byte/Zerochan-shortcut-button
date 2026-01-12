@@ -24,3 +24,13 @@ chrome.runtime.onMessage.addListener((msg, sender) => {
         );
     }
 });
+
+chrome.runtime.onMessage.addListener((msg) => {
+    if (msg.download) {
+        chrome.downloads.download({
+            url: msg.download,
+            conflictAction: "uniquify",
+            saveAs: false
+        });
+    }
+});
